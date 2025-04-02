@@ -267,3 +267,4 @@ struct FocusModeView_Preview: PreviewProvider {
 
 
 // record of focusing time
+// dog always move from the start

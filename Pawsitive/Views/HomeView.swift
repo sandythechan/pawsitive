@@ -8,20 +8,21 @@
 import SwiftUI
 
 struct HomeView: View {
-    @State private var bloodline: Int = 6
-    @State private var checkIn: Bool = false
-    @State private var showAlert1: Bool = false
-    @State private var showAlert2: Bool = false
-    @State private var showAlertExceedTime: Bool = false
-    @State private var markedDays: Set<Int> = []
+    @State var bloodline: Int = 6
+    @State var checkIn: Bool = false
+    @State var showAlert1: Bool = false
+    @State var showAlert2: Bool = false
+    @State var showAlertExceedTime: Bool = false
+    @State var markedDays: Set<Int> = []
     
-    @State private var lastPressedDate: Date? = nil
-    @State private var alarmTime: Date? = nil
-    @State private var selectedDays : [String] = []
-    @State private var selectedTimes : [String: (Int, Int)] = [:]
-    @State private var selectedAMPM: Bool = true
-    @State private var buttonPressedToday = false
+    @State var lastPressedDate: Date? = nil
+    @State var alarmTime: Date? = nil
     
+    @State var selectedDays : [[String]] = [[],[],[]]
+    @State var selectedTime : [String] = ["09:00 AM", "09:00 AM", "09:00 AM"]
+    @State var selectedAMPM: [Bool] = [true, true, true]
+    @State var buttonPressedToday = false
+    @State var alarmSetTime : [String: (Int, Int)] = [:]
 
     var body: some View {
             NavigationStack {
@@ -34,7 +35,8 @@ struct HomeView: View {
                         //button to go to sleep mode
                         NavigationLink(destination:
                             
-                                        SleepModeView(bloodline: $bloodline, markedDays: $markedDays, selectedDays: $selectedDays, selectedTimes: $selectedTimes, selectedAMPM: $selectedAMPM)){
+                                        SleepModeView(bloodline: $bloodline, markedDays: $markedDays, selectedDays: $selectedDays, selectedTimes: $selectedTime, selectedAMPM: $selectedAMPM,
+                                            alarmSetTime: $alarmSetTime)){
                             Rectangle()
                                 .fill(Color(red: 42/255, green: 139/255, blue: 201/255))
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -163,64 +165,69 @@ struct HomeView: View {
     func checkInStatus() {
         let now = Date()
         
-        for day in selectedDays {
-            guard let time = selectedTimes[day] else { continue }
-            
-            var components = Calendar.current.dateComponents([.hour, .minute, .weekday], from: now)
-            
-            switch day {
-            case "Mon": components.weekday = 2
-            case "Tue": components.weekday = 3
-            case "Wed": components.weekday = 4
-            case "Thu": components.weekday = 5
-            case "Fri": components.weekday = 6
-            case "Sat": components.weekday = 7
-            case "Sun": components.weekday = 1
-            default: break
-            }
-            
-            var alarmHour = time.0
-            if !selectedAMPM && alarmHour != 12 {  // PM case
-                alarmHour += 12
-            } else if selectedAMPM && alarmHour == 12 { // AM case
-                alarmHour = 0
-            }
-            
-            components.hour = alarmHour
-            components.minute = time.1
-            
-            alarmTime = Calendar.current.date(from: components)
-            
-            if let alarmTime = alarmTime {
-                let timeDifference = now.timeIntervalSince(alarmTime)
+        for i in 0..<3 {
+            for day in selectedDays[i] {
+                guard let time = alarmSetTime[day] else { continue }
                 
-                if timeDifference >= 0 && timeDifference <= 900 {
-                    if buttonPressedToday {
-                        showAlert1 = true
-                        if bloodline<6 {
-                            bloodline+=1
+                var components = Calendar.current.dateComponents([.hour, .minute, .weekday], from: now)
+                
+                switch day {
+                case "Mon": components.weekday = 2
+                case "Tue": components.weekday = 3
+                case "Wed": components.weekday = 4
+                case "Thu": components.weekday = 5
+                case "Fri": components.weekday = 6
+                case "Sat": components.weekday = 7
+                case "Sun": components.weekday = 1
+                default: break
+                }
+                
+                var alarmHour = time.0
+                if !selectedAMPM[i] && alarmHour != 12 {  // PM case
+                    alarmHour += 12
+                } else if selectedAMPM[i] && alarmHour == 12 { // AM case
+                    alarmHour = 0
+                }
+                
+                components.hour = alarmHour
+                components.minute = time.1
+                
+                alarmTime = Calendar.current.date(from: components)
+                
+                if let alarmTime = alarmTime {
+                    let timeDifference = now.timeIntervalSince(alarmTime)
+                    
+                    if timeDifference >= 0 && timeDifference <= 900 {
+                        if buttonPressedToday {
+                            showAlert1 = true
+                            if bloodline<6 {
+                                bloodline+=1
+                            }
+                        } else {
+                            markedDays.insert(Calendar.current.component(.day, from: now))
+                            lastPressedDate = now
+                            showAlert1=false
+                            showAlert2=true
+                            buttonPressedToday = true
                         }
                     } else {
-                        markedDays.insert(Calendar.current.component(.day, from: now))
-                        lastPressedDate = now
-                        showAlert1=false
-                        showAlert2=true
-                        buttonPressedToday = true
+                        if bloodline>0 && !buttonPressedToday{
+                            bloodline-=1
+                            buttonPressedToday = true
+                            showAlertExceedTime = true
+                        }
+                        showAlert1 = true
                     }
-                } else {
-                    if bloodline>0 && !buttonPressedToday{
-                        bloodline-=1
-                        buttonPressedToday = true
-                        showAlertExceedTime = true
-                    }
-                    showAlert1 = true
                 }
             }
+
         }
-    
     }
 }
 
+// #preview :
 #Preview {
-    HomeView()
+    HomeView(
+        
+    )
 }

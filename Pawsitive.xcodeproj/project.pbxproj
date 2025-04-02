@@ -7,26 +7,26 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		DCD2CC562D678B23000121F6 /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DCD2CC562D678B23000121F6 /* Pawsitive.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pawsitive.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		DCD2CC7C2D6795E7000121F6 /* Exceptions for "App" folder in "App" target */ = {
+		DC4FA7E82D953AA000CB6770 /* Exceptions for "Pawsitive" folder in "Pawsitive" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = DCD2CC552D678B23000121F6 /* App */;
+			target = DCD2CC552D678B23000121F6 /* Pawsitive */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		DCD2CC582D678B23000121F6 /* App */ = {
+		DCD2CC582D678B23000121F6 /* Pawsitive */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				DCD2CC7C2D6795E7000121F6 /* Exceptions for "App" folder in "App" target */,
+				DC4FA7E82D953AA000CB6770 /* Exceptions for "Pawsitive" folder in "Pawsitive" target */,
 			);
-			path = App;
+			path = Pawsitive;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -45,7 +45,7 @@
 		DCD2CC4D2D678B23000121F6 = {
 			isa = PBXGroup;
 			children = (
-				DCD2CC582D678B23000121F6 /* App */,
+				DCD2CC582D678B23000121F6 /* Pawsitive */,
 				DCD2CC572D678B23000121F6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -53,7 +53,7 @@
 		DCD2CC572D678B23000121F6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DCD2CC562D678B23000121F6 /* App.app */,
+				DCD2CC562D678B23000121F6 /* Pawsitive.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -61,9 +61,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		DCD2CC552D678B23000121F6 /* App */ = {
+		DCD2CC552D678B23000121F6 /* Pawsitive */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DCD2CC642D678B24000121F6 /* Build configuration list for PBXNativeTarget "App" */;
+			buildConfigurationList = DCD2CC642D678B24000121F6 /* Build configuration list for PBXNativeTarget "Pawsitive" */;
 			buildPhases = (
 				DCD2CC522D678B23000121F6 /* Sources */,
 				DCD2CC532D678B23000121F6 /* Frameworks */,
@@ -74,13 +74,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				DCD2CC582D678B23000121F6 /* App */,
+				DCD2CC582D678B23000121F6 /* Pawsitive */,
 			);
-			name = App;
+			name = Pawsitive;
 			packageProductDependencies = (
 			);
 			productName = App;
-			productReference = DCD2CC562D678B23000121F6 /* App.app */;
+			productReference = DCD2CC562D678B23000121F6 /* Pawsitive.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -98,7 +98,7 @@
 					};
 				};
 			};
-			buildConfigurationList = DCD2CC512D678B23000121F6 /* Build configuration list for PBXProject "Pawsitiv" */;
+			buildConfigurationList = DCD2CC512D678B23000121F6 /* Build configuration list for PBXProject "Pawsitive" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -112,7 +112,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DCD2CC552D678B23000121F6 /* App */,
+				DCD2CC552D678B23000121F6 /* Pawsitive */,
 			);
 		};
 /* End PBXProject section */
@@ -265,11 +265,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"App/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Pawsitive/Preview Content\"";
 				DEVELOPMENT_TEAM = 8T3BS6G594;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = App/Info.plist;
+				INFOPLIST_FILE = Pawsitive/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -280,7 +280,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.cksandy1231-icloud";
+				PRODUCT_BUNDLE_IDENTIFIER = com.Pawsitive;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -297,11 +297,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"App/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Pawsitive/Preview Content\"";
 				DEVELOPMENT_TEAM = 8T3BS6G594;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = App/Info.plist;
+				INFOPLIST_FILE = Pawsitive/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -312,7 +312,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.cksandy1231-icloud";
+				PRODUCT_BUNDLE_IDENTIFIER = com.Pawsitive;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -324,7 +324,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		DCD2CC512D678B23000121F6 /* Build configuration list for PBXProject "Pawsitiv" */ = {
+		DCD2CC512D678B23000121F6 /* Build configuration list for PBXProject "Pawsitive" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DCD2CC622D678B24000121F6 /* Debug */,
@@ -333,7 +333,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DCD2CC642D678B24000121F6 /* Build configuration list for PBXNativeTarget "App" */ = {
+		DCD2CC642D678B24000121F6 /* Build configuration list for PBXNativeTarget "Pawsitive" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DCD2CC652D678B24000121F6 /* Debug */,

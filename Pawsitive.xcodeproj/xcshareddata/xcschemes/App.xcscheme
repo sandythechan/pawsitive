@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "DCD2CC552D678B23000121F6"
-               BuildableName = "App.app"
-               BlueprintName = "App"
-               ReferencedContainer = "container:Pawsitiv.xcodeproj">
+               BuildableName = "Pawsitive.app"
+               BlueprintName = "Pawsitive"
+               ReferencedContainer = "container:Pawsitive.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DCD2CC552D678B23000121F6"
-            BuildableName = "App.app"
-            BlueprintName = "App"
-            ReferencedContainer = "container:Pawsitiv.xcodeproj">
+            BuildableName = "Pawsitive.app"
+            BlueprintName = "Pawsitive"
+            ReferencedContainer = "container:Pawsitive.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DCD2CC552D678B23000121F6"
-            BuildableName = "App.app"
-            BlueprintName = "App"
-            ReferencedContainer = "container:Pawsitiv.xcodeproj">
+            BuildableName = "Pawsitive.app"
+            BlueprintName = "Pawsitive"
+            ReferencedContainer = "container:Pawsitive.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
