@@ -12,7 +12,7 @@ import UserNotifications
 struct AlarmSection: View{
     @Binding var selectedAMPM: [Bool]
     @Binding var selectedDays: [[String]]
-    @Binding var selectedTimes: [String]
+    @Binding var selectedTime: [String]
     @Binding var alarmSetTime: [String: (Int, Int)]
     var body: some View{
         VStack {
@@ -28,7 +28,7 @@ struct AlarmSection: View{
                 .frame(height:10)
             
             SetUpAlarm(
-                selectedTime: $selectedTimes,
+                selectedTime: $selectedTime,
                 selectedAMPM: $selectedAMPM,
                 selectedDays: $selectedDays,
                 alarmSetTime: $alarmSetTime
@@ -46,6 +46,7 @@ struct TimePicker: View {
     var minuteSelection: Binding<Int>
     var ampmSelection: Binding<Bool>
     var thisAlarm: Binding<Bool>
+    @Binding var AlarmSet: Bool
     
     var body: some View {
         HStack (spacing: 0){
@@ -58,6 +59,7 @@ struct TimePicker: View {
                 .font(Font.custom("Jersey25-Regular", size: 33))
                 .foregroundColor(.white)
                 .frame(width: 140, alignment: .leading)
+                .disabled(AlarmSet)
                 // .padding(.horizontal, 5)
             
             Picker("Hour", selection: hourSelection) {
@@ -65,9 +67,7 @@ struct TimePicker: View {
                     Text(String(format: "%02d", hour))
                         .tag(hour)
                         .font(Font.custom("Jersey25-Regular",size: 40))
-                        .foregroundColor(.white)
-                    Text(" ")
-                }
+                        .foregroundColor(.white)                }
             }
             .frame(width: 65, height: 70)
             .clipped()
@@ -83,7 +83,6 @@ struct TimePicker: View {
                         .tag(minute)
                         .font(Font.custom("Jersey25-Regular",size: 40))
                         .foregroundColor(.white)
-                    Text(" ")
                 }
             }
             .frame(width: 65, height: 70)
@@ -94,7 +93,6 @@ struct TimePicker: View {
                 Text("AM").tag(true)
                     .font(Font.custom("Jersey25-Regular",size: 40))
                     .foregroundColor(.white)
-                Text(" ")
                 Text("PM").tag(false)
                     .font(Font.custom("Jersey25-Regular",size: 40))
                     .foregroundColor(.white)
@@ -128,6 +126,7 @@ struct SetUpAlarm: View {
     @Binding var selectedDays: [[String]]
     @Binding var alarmSetTime: [String: (Int, Int)]
     @State var thisAlarm: [Bool] = [false, false, false] // which alarm is set
+    @State var AlarmSet = false
     
     @State var anySet: Bool = false
     
@@ -142,16 +141,18 @@ struct SetUpAlarm: View {
                 // may not reflects changes properly -> use helper function to get Binding
                 TimePicker(
                     label: label[i],
-                    hourSelection: binding(array: $selectedHour, index: i),
-                    minuteSelection: binding(array: $selectedMinute, index: i),
-                    ampmSelection: binding(array: $selectedAMPM, index: i),
-                    thisAlarm: binding(array: $thisAlarm, index: i)
+                    hourSelection: $selectedHour[i],
+                    minuteSelection: $selectedMinute[i],
+                    ampmSelection: $selectedAMPM[i],
+                    thisAlarm: $thisAlarm[i],
+                    AlarmSet: $AlarmSet
                 )
             }
             
             Button(action: {
                 //action block : runs when button is tapped
                 setAlarm()
+                //AlarmSet.toggle()
             }) {
                 // view block : builds UI appearance
                 Rectangle()
@@ -167,23 +168,34 @@ struct SetUpAlarm: View {
                 }
                 .padding()
                 .alert(isPresented: $showAlert) {
-                    Alert(
-                        title: Text(alertTitle),
-                        message: Text(alertMessage),
-                        dismissButton: .default(Text("Ok"))
-                    )
+                    if AlarmSet {
+                        return Alert(
+                            title: Text(alertTitle),
+                            message: Text(alertMessage),
+                            primaryButton: .destructive(Text("Yes")) {
+                                AlarmSet = false
+                                for i in 0..<thisAlarm.count {
+                                    thisAlarm[i] = false
+                                // further mechanism is needed
+                                // like time
+                                }
+                            },
+                            secondaryButton: .cancel(Text("No"))
+                        )
+                    } else {
+                        return Alert(
+                            title: Text(alertTitle),
+                            message: Text(alertMessage),
+                            dismissButton: .default(Text("Ok")) {
+                                AlarmSet = true
+                            }
+                            
+                        )
+                    }
                 }
             }
             .padding(.top, 0)
         }
-        
-    // helper function : get the Binding for specific index
-    func binding<T>(array: Binding<[T]>, index: Int) -> Binding<T> {
-        return Binding<T>(
-                get: { array.wrappedValue[index]},
-                set: { array.wrappedValue[index] = $0}
-        )
-    }
     
     func requestPermission() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
@@ -209,6 +221,7 @@ struct SetUpAlarm: View {
         selectedDays[1] = ["Mon", "Tue", "Wed", "Thu", "Fri"]
         selectedDays[2] = ["Sat", "Sun"]
         
+        
         // traditional for loop : control over index
         // ForEach : for SwiftUI views
         
@@ -216,45 +229,41 @@ struct SetUpAlarm: View {
             if (thisAlarm[i]) {
                 anySet = true
                 
-                selectedTime[i] = formatAlarmTime(
-                    hour: selectedHour[i],
-                    minute: selectedMinute[i],
-                    ampm: selectedAMPM[i] ? "AM" : "PM"
-                )
-                
                 for day in selectedDays[i] {
-                    alarmSetTime[day] = (selectedHour[i], selectedMinute[i])
+                    alarmSetTime[day] = (selectedHour[i]+1, selectedMinute[i])
                     scheduleNotification(for: day, index: i)
                 }
                 
+                let hour = String(format:"%02d", selectedHour[i])
+                let minute = String(format:"%02d", selectedMinute[i])
+                let ampm = selectedAMPM[i] ? "AM" : "PM"
+                
                 if (i<3) {
-                    alertMessage += "\(label[i]) : \(selectedTime[i])!\n"
+                    alertMessage += "\(label[i]) : \(hour):\(minute) \(ampm)!\n"
                 } else {
-                    alertMessage += "\(label[i]) : \(selectedTime[i])!"
+                    alertMessage += "\(label[i]) : \(hour):\(minute) \(ampm)!\n"
                 }
                 
                 showAlert = true
             }
         }
         
-        if anySet {
+        if (anySet && !AlarmSet) {
             alertTitle = "Alarm Set!"
             label_button = "reset alarm"
-            alertMessage += "\nHuman see u tmr morning 🐾"
+            alertMessage += "\nHuman see u soon 🐾"
+        } else if (AlarmSet) {
+            alertTitle = "Reset your alarm?"
+            label_button = "reset alarm"
+            alertMessage = "Do you want to reset your alarm?"
+            // current alarm?
         } else {
-            alertTitle = "No Alarm Selected"
+            alertTitle = "Woof! No Alarm Selected"
             label_button = "set alarm"
             alertMessage = "Click to choose daily, weekday or weekend alarm."
         }
         showAlert = true
     }
-    
-    func formatAlarmTime(hour: Int, minute: Int, ampm: String) -> String {
-        let formattedHour = String(format: "%02d", hour)
-        let formattedMinute = String(format: "%02d", minute)
-        return "\(formattedHour):\(formattedMinute) \(ampm)"
-    }
-
     
     func scheduleNotification(for day: String, index: Int) {
         
@@ -332,8 +341,8 @@ struct WalkSection: View {
             .padding(.bottom,0)
             
             CalendarView(markedDays: $markedDays)
-                .frame(maxWidth: .infinity, maxHeight: 400)
                 .padding(.top, 0)
+                .frame(maxWidth: .infinity, alignment: .top)
         }
     }
 }
@@ -448,7 +457,7 @@ struct SleepModeView: View {
     @Binding var markedDays: Set<Int>
     
     @Binding var selectedDays: [[String]]
-    @Binding var selectedTimes: [String]
+    @Binding var selectedTime: [String]
     @Binding var selectedAMPM: [Bool]
     @Binding var alarmSetTime: [String: (Int, Int)]
     
@@ -467,7 +476,7 @@ struct SleepModeView: View {
                             .overlay(AlarmSection(
                                 selectedAMPM: $selectedAMPM,
                                 selectedDays: $selectedDays,
-                                selectedTimes: $selectedTimes,
+                                selectedTime: $selectedTime,
                                 alarmSetTime: $alarmSetTime
                                 )
                             )
@@ -501,7 +510,7 @@ struct SleepModeView_Preview: PreviewProvider {
     @State static var markedDays: Set<Int> = []
     
     @State static var selectedDays: [[String]] = [[],[],[]]
-    @State static var selectedTimes: [String] = ["09:00 AM", "09:00 AM", "09:00 AM"]
+    @State static var selectedTime: [String] = ["","",""]
     @State static var selectedAMPM: [Bool] = [true, true, true]
     @State static var alarmSetTime: [String: (Int, Int)] = [:]
     // preview provider : static structure
@@ -511,7 +520,7 @@ struct SleepModeView_Preview: PreviewProvider {
             bloodline: $bloodline,
             markedDays: $markedDays,
             selectedDays: $selectedDays,
-            selectedTimes: $selectedTimes,
+            selectedTime: $selectedTime,
             selectedAMPM: $selectedAMPM,
             alarmSetTime: $alarmSetTime
         )
@@ -520,5 +529,4 @@ struct SleepModeView_Preview: PreviewProvider {
 
 // text : alarm is set | button : reset alarm
 // show the time set
-// notification : Human see u tmr morning!
 // reset alarm no -> reset the unselected

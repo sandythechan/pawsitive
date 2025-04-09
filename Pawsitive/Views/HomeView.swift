@@ -19,10 +19,10 @@ struct HomeView: View {
     @State var alarmTime: Date? = nil
     
     @State var selectedDays : [[String]] = [[],[],[]]
-    @State var selectedTime : [String] = ["09:00 AM", "09:00 AM", "09:00 AM"]
+    @State var selectedTime : [String] = []
     @State var selectedAMPM: [Bool] = [true, true, true]
     @State var buttonPressedToday = false
-    @State var alarmSetTime : [String: (Int, Int)] = [:]
+    @State var alarmSetTime: [String: (Int, Int)] = [:]
 
     var body: some View {
             NavigationStack {
@@ -35,7 +35,7 @@ struct HomeView: View {
                         //button to go to sleep mode
                         NavigationLink(destination:
                             
-                                        SleepModeView(bloodline: $bloodline, markedDays: $markedDays, selectedDays: $selectedDays, selectedTimes: $selectedTime, selectedAMPM: $selectedAMPM,
+                                        SleepModeView(bloodline: $bloodline, markedDays: $markedDays, selectedDays: $selectedDays, selectedTime: $selectedTime, selectedAMPM: $selectedAMPM,
                                             alarmSetTime: $alarmSetTime)){
                             Rectangle()
                                 .fill(Color(red: 42/255, green: 139/255, blue: 201/255))
