@@ -9,6 +9,12 @@ import SwiftUI
 import Foundation
 import UserNotifications
 
+class AlarmSetting : ObservableObject {
+    @Published var alarmSetTime: [String: (Int, Int)] = [:]
+    //@Published var selectedDays: [[String]]
+    
+}
+
 struct AlarmSection: View{
     @Binding var selectedAMPM: [Bool]
     @Binding var selectedDays: [[String]]
@@ -127,6 +133,7 @@ struct SetUpAlarm: View {
     @Binding var alarmSetTime: [String: (Int, Int)]
     @State var thisAlarm: [Bool] = [false, false, false] // which alarm is set
     @State var AlarmSet = false
+    @State var permissionReject = false
     
     @State var anySet: Bool = false
     
@@ -168,12 +175,26 @@ struct SetUpAlarm: View {
                 }
                 .padding()
                 .alert(isPresented: $showAlert) {
-                    if AlarmSet {
+                    if permissionReject {
+                        return Alert(
+                            title: Text("Enable Notifications"),
+                            message: Text("Enable notifications in settings to receive your alarm"),
+                            primaryButton:. default(Text("Go to Settings")) {
+                                if let settingsURL = URL(string: UIApplication.openSettingsURLString),
+                                    UIApplication.shared.canOpenURL(settingsURL) {
+                                        UIApplication.shared.open(settingsURL)
+                                    }
+                            },
+                            secondaryButton: .cancel()
+                     
+                        )
+                    } else if AlarmSet && !anySet{ // reset alarm
                         return Alert(
                             title: Text(alertTitle),
                             message: Text(alertMessage),
                             primaryButton: .destructive(Text("Yes")) {
                                 AlarmSet = false
+                                anySet = false
                                 for i in 0..<thisAlarm.count {
                                     thisAlarm[i] = false
                                 // further mechanism is needed
@@ -182,7 +203,7 @@ struct SetUpAlarm: View {
                             },
                             secondaryButton: .cancel(Text("No"))
                         )
-                    } else {
+                    } else { // no alarm / alarm set
                         return Alert(
                             title: Text(alertTitle),
                             message: Text(alertMessage),
@@ -192,35 +213,22 @@ struct SetUpAlarm: View {
                             
                         )
                     }
+                    
                 }
             }
             .padding(.top, 0)
         }
     
-    func requestPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
-            if let error = error {
-                print("Permission Error: \(error)")
-                return
-            }
-            if granted {
-                print("Permission granted")
-            } else {
-                print("Permission denied")
-            }
-        }
-    }
-    
     func setAlarm() {
         anySet = false
         alertMessage = ""
-        
-        requestPermission()
+            
+        requestPermission(completionHandler: {})
+        // completionHandler : closure parameter - pass to function
      
         selectedDays[0] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
         selectedDays[1] = ["Mon", "Tue", "Wed", "Thu", "Fri"]
         selectedDays[2] = ["Sat", "Sun"]
-        
         
         // traditional for loop : control over index
         // ForEach : for SwiftUI views
@@ -265,52 +273,100 @@ struct SetUpAlarm: View {
         showAlert = true
     }
     
-    func scheduleNotification(for day: String, index: Int) {
+    let notificationCenter = UNUserNotificationCenter.current()
+    
+    func requestPermission(completionHandler:@escaping () -> Void) {
+        // takes completion handler (run after check/asking notification permission)
+        // @escaping: handler will be called later, not immediately
         
-        let content = UNMutableNotificationContent()
-        content.title = "Time To Wake Up!"
-        content.body = "It is time to walk your dog"
-        content.sound = UNNotificationSound.default
-        
-        var hour = selectedHour[index]
-        
-        if !selectedAMPM[index] && hour != 12 {
-                hour += 12
-        } else if selectedAMPM[index] && hour == 12 {
-                hour = 0
-        }
-        
-        var components = DateComponents()
-        components.hour = hour
-        components.minute = selectedMinute[index]
-        
-        switch day {
-        case "Mon": components.weekday = 2
-        case "Tue": components.weekday = 3
-        case "Wed": components.weekday = 4
-        case "Thu": components.weekday = 5
-        case "Fri": components.weekday = 6
-        case "Sat": components.weekday = 7
-        case "Sun": components.weekday = 1
-        default: break
-        }
-        
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
-        
-        let request = UNNotificationRequest(
-            identifier: "alarm_\(day)_\(index)",
-            content: content,
-            trigger: trigger
-        )
-        
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("Error scheduling notification: \(error)")
-            } else {
-                print("Notification scheduled for \(day)!")
+        // types of notifications
+        let options: UNAuthorizationOptions = [.alert, .badge, .sound]
+        notificationCenter.getNotificationSettings { settings in
+            let completion: () -> Void = { // define helper closure to run completion handler
+                DispatchQueue.main.async { // ensure UI updates run on the main thread
+                    completionHandler()
+                    // pass from outside the function
+                }
+            }
+            
+            switch settings.authorizationStatus {
+            // evaulate one variable
+            case .notDetermined:
+                notificationCenter.requestAuthorization(options: options) {
+                    _, _ in // ignore the value OR use granted/error
+                    // after response : signal end of the process [local closure]
+                    completion()
+                }
+            case .denied, .authorized, .provisional, .ephemeral:
+                // temporary permission / temporary session-based
+                completion()
+            @unknown default: //safety net for future IOS update, code will not crash
+                completion()
             }
         }
     }
+    
+    
+    func scheduleNotification(for day: String, index: Int) {
+        notificationCenter.getNotificationSettings { settings in
+            if (settings.authorizationStatus == .authorized) {
+                
+                // content
+                let content = UNMutableNotificationContent()
+                content.title = "Time To Wake Up!"
+                content.body = "It is time to walk your dog"
+                content.sound = UNNotificationSound.default
+                
+                // schedule the date
+                var hour = selectedHour[index]
+                if !selectedAMPM[index] && hour != 12 {
+                        hour += 12
+                } else if selectedAMPM[index] && hour == 12 {
+                        hour = 0
+                }
+                
+                var components = DateComponents() // define specific date and time info for scheduling notification
+                components.calendar = Calendar.current
+                components.hour = hour
+                components.minute = selectedMinute[index]
+                
+                switch day {
+                case "Mon": components.weekday = 2
+                case "Tue": components.weekday = 3
+                case "Wed": components.weekday = 4
+                case "Thu": components.weekday = 5
+                case "Fri": components.weekday = 6
+                case "Sat": components.weekday = 7
+                case "Sun": components.weekday = 1
+                default: break
+                }
+                
+                // trigger
+                let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+                
+                // request
+                let request = UNNotificationRequest(
+                    identifier: UUID().uuidString,
+                    // unique identifier for notification request
+                    // ensure each notification has a distinct identifier : useful for update/remov notification
+                    content: content,
+                    trigger: trigger
+                )
+                
+                // add notification
+                self.notificationCenter.add(request) { error in
+                    if let error = error {
+                        print("Error scheduling notification: \(error)")
+                    } else {
+                        print("Notification scheduled for \(day)!")
+                    }
+                }
+            } else {
+                permissionReject = true
+            }
+        }
+    }
+    
     
 }
 
